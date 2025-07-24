@@ -1,4 +1,4 @@
-# Interpretation and Final Thoughts
+# Final Thoughts
 
 This project aimed to classify **tumor vs. normal** lung tissue using **T-cell receptor (TRB) CDR3 sequences**, applying deep learning to biological sequence data. Below is a breakdown of the steps we took, why we made certain decisions, and the lessons learned along the way.
 
