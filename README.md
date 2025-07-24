@@ -1,4 +1,4 @@
-# DL-TCR-TRB-CDR3-Classification
+# DL-TRB-CDR3-Classification
 Tumor vs Normal TCR Classification Using Deep Learning on TRB CDR3 Sequences
 This project investigates whether deep learning can distinguish between tumor and normal tissue based on patient-level TRB CDR3 sequences. The aim is to explore the potential of T-cell receptor (TCR) repertoire signatures for tumor classification.
 
