@@ -54,7 +54,7 @@ Despite modest performance, the project demonstrates a fully reproducible pipeli
 - Try attention-based models (e.g., Transformers)
 - Tune hyperparameters with Optuna
 - Include V/D/J gene features
-- Use larger cohort from other cancer types (if available)
+- Use larger cohort from other cancer types 
 
 ---
 
