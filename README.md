@@ -1,65 +1,113 @@
-# DL-TRB-CDR3-Classification
-Tumor vs Normal TCR Classification Using Deep Learning on TRB CDR3 Sequences
-This project investigates whether deep learning can distinguish between tumor and normal tissue based on patient-level TRB CDR3 sequences. The aim is to explore the potential of T-cell receptor (TCR) repertoire signatures for tumor classification.
+# GATK4-CNV-Pipeline
+Copy Number Variation Analysis for Cancer RNA-Seq Data
 
-We applied preprocessing, tokenization, padding, and normalization to real immune repertoire data (sourced from dbGaP/GDC). Two modeling strategies were evaluated:
-- Mean Pooling with Embedding + Linear Layer
-- LSTM-based sequence encoding
+This project implements a fully reproducible workflow for computing CNVs from large-scale dbGaP/GDC RNA-seq cohorts using GATK4.  
+The workflow is organized into three phases: pre-processing (SRA → FASTQ → BAM), CNV processing (GATK CNV tools), and post-processing (gene-level CNV matrix + survival analysis).
 
-Despite modest performance, the project demonstrates a fully reproducible pipeline with thoughtful EDA, deep learning modeling, and suggestions for future improvements.
-
+The goal is to provide a structured pipeline that scales on HPC (Slurm) systems and supports downstream statistical and clinical analyses.
 
 ---
 
-## Methodology
+## Pre-Processing Workflow
 
-- **Input:** Patient-level CDR3 sequences (`Sample ID`, `CDR3`, `label`)
-- **Tokenization:** Each amino acid is mapped to an integer token
-- **Padding:** All CDR3s padded to 22 amino acids
-- **Normalization:** Exactly 20 CDR3s per patient (downsample or pad)
-- **Labeling:** `Tumor` vs `Normal` (binary classification)
+- Download and verify SRA accessions  
+- Extract FASTQ files using fasterq-dump (scratch-based execution)  
+- Align FASTQ files with BWA-mem2  
+- Sort and index BAM files using samtools  
+- Perform QC and metadata preparation (Python + Jupyter)
 
----
+Folder: `workflow/01-pre_processing`
 
-## Models
-
-### 1. Mean Pooling Baseline
-- Embedding → Mean of all CDR3 embeddings → Dense layer
-- Achieved ~59% accuracy, F1 ~0.58
-
-### 2. LSTM-Based Model *(optional)*
-- Sequence → LSTM → Final hidden → Dense layer
-- Slightly worse performance; limited by data size and variability
+Files:
+- 01_pre.sh  
+- 02_pre.sh  
+- 03_pre.py  
+- 04_pre.ipynb  
 
 ---
 
-##  Exploratory Data Insights
+## CNV Processing (GATK4)
 
-- CDR3 sequence lengths range from 6 to 22 AAs (median ~14)
-- Tumor/Normal samples have 20–70 unique CDR3s per patient
-- Tokenization preserves biological granularity while enabling modeling
+- CollectReadCounts for tumor and normal samples  
+- Build Panel of Normals (CreateReadCountPanelOfNormals)  
+- Apply DenoiseReadCounts using PoN  
+- Segment genomes using ModelSegments  
+- Export CNV segments and copy-ratio files
 
----
+Folder: `workflow/02-processing`
 
-## Limitations & Learnings
-
-- Limited number of normal samples (n ≈ 277)
-- No clear predictive signal learned from short TRB CDR3s
-- Still, this project is valuable for understanding end-to-end deep learning workflows on immunogenomic data
-
----
-
-## Future Directions
-
-- Try attention-based models (e.g., Transformers)
-- Tune hyperparameters with Optuna
-- Include V/D/J gene features
-- Use larger cohort from other cancer types 
+Files:
+- 01_main.sh  
+- 02_main.sh  
+- 03_main.sh  
+- 04_main.sh  
+- 05_main.sh  
+- 06_main.sh  
+- 07_main.sh  
+- 08_main.sh  
 
 ---
 
-## Resources & Links
+## Post-Processing & Analysis
 
-- Blog write-up: _Coming soon_
-- Data source: [GDC Data Portal](https://portal.gdc.cancer.gov/)
-- Author: [Tushar Singh]([https://your-website-link.com](https://tushar-bioinfo.github.io/learning-bioinformatics/)])
+- Map CNV segments to gene coordinates (R)  
+- Generate gene-level CNV matrices for cohort analyses  
+- Perform survival analysis (Kaplan–Meier, Cox models) in Jupyter notebooks
+
+Folder: `workflow/03-post_processing`
+
+Files:
+- main_01.R  
+- main_02.R  
+- survival_analysis.ipynb  
+
+---
+
+## Project Structure
+
+workflow/  
+    01-pre_processing/  
+    02-processing/  
+    03-post_processing/  
+
+Each stage is modular and can be executed independently on an HPC cluster.
+
+---
+
+## Requirements
+
+Software:
+- GATK 4.x  
+- BWA-mem2  
+- samtools  
+- SRA Toolkit  
+- Python 3.9+  
+- R 4.0+  
+- Slurm HPC environment  
+
+R packages:
+- dplyr  
+- data.table  
+- GenomicRanges  
+- readr  
+
+Python packages:
+- pandas  
+- numpy  
+
+---
+
+## Outputs
+
+- Denoised copy-ratio files  
+- CNV segmentation tables  
+- Gene-level CNV matrix  
+- Survival analysis figures and summaries  
+
+---
+
+## Notes
+
+- Workflow is compatible with dbGaP-compliant secure environments  
+- Interval lists must remain consistent across samples  
+- Scratch directories should be adjusted based on HPC configuration  
